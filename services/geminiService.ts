@@ -52,7 +52,8 @@ export const generatePoster = async (
   productImage: ImageFile,
   concept: string,
   aspectRatio: string,
-  referenceImage?: ImageFile | null
+  referenceImage?: ImageFile | null,
+  logoImage?: ImageFile | null
 ): Promise<string> => {
     const productPart = fileToGenerativePart(productImage.base64, productImage.mimeType);
     const parts: any[] = [productPart];
@@ -67,6 +68,12 @@ export const generatePoster = async (
         const referencePart = fileToGenerativePart(referenceImage.base64, referenceImage.mimeType);
         parts.push(referencePart);
         textPrompt += "\nTake heavy inspiration from the style, color palette, and composition of the second image provided as a reference.";
+    }
+
+    if (logoImage) {
+        const logoPart = fileToGenerativePart(logoImage.base64, logoImage.mimeType);
+        parts.push(logoPart);
+        textPrompt += "\nAn additional image is provided which is a brand logo. Place this logo tastefully on the poster, for example in one of the corners. Ensure the logo is clear and legible but doesn't overpower the main design.";
     }
 
     parts.push({ text: textPrompt });
@@ -90,17 +97,27 @@ export const generatePoster = async (
 
 export const refinePoster = async (
   currentPoster: string,
-  refinementPrompt: string
+  refinementPrompt: string,
+  logoImage?: ImageFile | null
 ): Promise<string> => {
   const base64Data = currentPoster.split(',')[1];
   const mimeType = currentPoster.match(/data:(.*);/)?.[1] || 'image/png';
 
   const imagePart = fileToGenerativePart(base64Data, mimeType);
-  const promptPart = { text: refinementPrompt };
+  const parts: any[] = [imagePart];
+  let fullPrompt = refinementPrompt;
+
+  if (logoImage) {
+      const logoPart = fileToGenerativePart(logoImage.base64, logoImage.mimeType);
+      parts.push(logoPart);
+      fullPrompt += "\nAn additional image is provided which is a brand logo. Please ensure this logo remains on the poster, placed tastefully (e.g., in a corner). If it's not present, add it.";
+  }
+
+  parts.push({ text: fullPrompt });
 
   const response = await ai.models.generateContent({
     model,
-    contents: { parts: [imagePart, promptPart] },
+    contents: { parts },
     config: {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
     },

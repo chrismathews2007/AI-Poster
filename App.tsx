@@ -15,6 +15,7 @@ const App: React.FC = () => {
     const [productImage, setProductImage] = useState<ImageFile | null>(null);
     const [imageWithoutBg, setImageWithoutBg] = useState<ImageFile | null>(null);
     const [referenceImage, setReferenceImage] = useState<ImageFile | null>(null);
+    const [logoImage, setLogoImage] = useState<ImageFile | null>(null);
     const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
     const [posterConcept, setPosterConcept] = useState<string>('');
     const [generatedPoster, setGeneratedPoster] = useState<string | null>(null);
@@ -49,7 +50,7 @@ const App: React.FC = () => {
         setIsLoading(true);
         setLoadingMessage('Generating your poster...');
         try {
-            const posterData = await generatePoster(imageWithoutBg, posterConcept, aspectRatio, referenceImage);
+            const posterData = await generatePoster(imageWithoutBg, posterConcept, aspectRatio, referenceImage, logoImage);
             setGeneratedPoster(posterData);
         } catch (e) {
             console.error(e);
@@ -65,7 +66,7 @@ const App: React.FC = () => {
         setIsLoading(true);
         setLoadingMessage('Refining your poster...');
         try {
-            const refinedPosterData = await refinePoster(generatedPoster, message);
+            const refinedPosterData = await refinePoster(generatedPoster, message, logoImage);
             setGeneratedPoster(refinedPosterData);
         } catch (e) {
             console.error(e);
@@ -128,6 +129,8 @@ const App: React.FC = () => {
                     </div>
                     
                     <ImageUploader id="reference-uploader" label="Reference Image (Optional)" onImageUpload={setReferenceImage} uploadedImageName={referenceImage?.name} />
+
+                    <ImageUploader id="logo-uploader" label="Logo Image (Optional)" onImageUpload={setLogoImage} uploadedImageName={logoImage?.name} />
 
                     <button
                         onClick={handleGeneratePoster}
