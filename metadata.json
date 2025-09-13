@@ -1,0 +1,5 @@
+{
+  "name": "AI Poster Designer",
+  "description": "An interactive poster designing app that uses AI to remove backgrounds, generate stunning visuals based on user concepts, and allow for iterative refinements. Users can upload product images, define a concept, and collaborate with the AI to create and download professional-looking posters.",
+  "requestFramePermissions": []
+}
